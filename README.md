@@ -29,13 +29,17 @@ To add a new task:
 
 To view the list of all existing tasks:
 
-		> fp list
+    > fp list
+
+To remove a new task:
+
+    > fp remove "My new task"
 
 To start working through your tasks:
 
-		> fp start
+    > fp start
 
-When the task is complete, the terminal bell will ding and you will be prompted to move on to the next task ('n') or quit ('q')
+When the task is complete, the terminal bell will ding and you will be prompted to move on to the next task ('n'), finish and move on ('f') or quit ('q')
 
 While working through tasks, press:
 
