@@ -1,8 +1,6 @@
 User Stories for FuturePerfect
 ==============================
 
-<hr />
-
 As a client manager<br />
 In order to make sure I give each client their fair share of my time<br />
 I want to work on each client's work at equal intervals
