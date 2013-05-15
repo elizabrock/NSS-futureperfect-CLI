@@ -5,7 +5,8 @@ class TestAddingProject < Test::Unit::TestCase
     # start with no projects
     assert_equal Project.count, 0
     # `ruby futureperfect add foo`
-    Project.create( name: 'foo' )
+    project = Project.create( name: 'foo' )
+    # project => #<Project:12312 @name='foo'>
     # end up with a 'foo' project
     assert_equal Project.count, 1
   end
