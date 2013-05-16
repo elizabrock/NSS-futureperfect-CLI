@@ -13,4 +13,10 @@ elsif command == "list"
   projects.each_with_index do |project, i|
     puts "#{i+1}. #{project.name}"
   end
+elsif command == "remove"
+  project_name = ARGV[1]
+  matching_projects = Project.where(name: project_name).all
+  matching_projects.each do |project|
+    project.destroy
+  end
 end
