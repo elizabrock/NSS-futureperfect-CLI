@@ -1,6 +1,9 @@
 require 'test/unit'
 require_relative '../bootstrap_ar'
 
-#other test prep stuff goes here
-
-Project.destroy_all
+module DatabaseCleaner
+  def after_teardown
+    super
+    Project.destroy_all
+  end
+end

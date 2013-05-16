@@ -1,6 +1,16 @@
 #!/usr/bin/env ruby
 
-# ARGV = [add, foo]
-project_name = ARGV[1]
 require_relative 'bootstrap_ar'
-Project.create(name: project_name)
+
+# ARGV = [add, foo]
+command = ARGV[0]
+
+if command == "add"
+  project_name = ARGV[1]
+  Project.create(name: project_name)
+elsif command == "list"
+  projects = Project.all
+  projects.each_with_index do |project, i|
+    puts "#{i+1}. #{project.name}"
+  end
+end

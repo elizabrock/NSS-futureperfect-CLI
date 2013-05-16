@@ -1,6 +1,8 @@
 require 'test_helper'
 
-class TestAddingProject < Test::Unit::TestCase
+class TestAddingProject < MiniTest::Unit::TestCase
+  include DatabaseCleaner
+
   def test_takes_arguments_and_saves_them
     assert_equal 0, Project.count
     puts `ruby futureperfect add foo`
