@@ -1,0 +1,6 @@
+#!/usr/bin/env ruby
+
+# ARGV = [add, foo]
+project_name = ARGV[1]
+require_relative 'bootstrap_ar'
+Project.create(name: project_name)
