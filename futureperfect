@@ -7,7 +7,12 @@ command = ARGV[0]
 
 if command == "add"
   project_name = ARGV[1]
-  Project.create(name: project_name)
+  project = Project.new(name: project_name)
+  if project.save
+    puts "Success!"
+  else
+    puts "Failure: #{project.errors.full_messages.join(", ")}"
+  end
 elsif command == "list"
   projects = Project.all
   projects.each_with_index do |project, i|
