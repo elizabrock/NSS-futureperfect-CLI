@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 
 require_relative 'bootstrap_ar'
+database = ENV['FP_ENV'] || 'development'
+connect_to database
 
 # ARGV = [add, foo]
 command = ARGV[0]
@@ -11,7 +13,7 @@ if command == "add"
   if project.save
     puts "Success!"
   else
-    puts "Failure: #{project.errors.full_messages.join(", ")}"
+    puts "Failure :( #{project.errors.full_messages.join(", ")}"
   end
 elsif command == "list"
   projects = Project.all
