@@ -20,4 +20,17 @@ elsif command == "remove"
   controller.destroy
 elsif command == "start"
   controller.work
+else
+  unless command == "help"
+    puts "FuturePerfect does not (yet?) support the '#{command}' command.\n\n"
+  end
+  puts <<EOS
+Currently supported commands are:
+* futureperfect list
+* futureperfect add <project_name>
+* futureperfect remove <project_name>
+* futureperfect start
+
+See the README for more details
+EOS
 end
