@@ -1,4 +1,5 @@
 class FuturePerfectController
+  include Formatter
 
   def initialize params
     @params = params
@@ -31,7 +32,8 @@ class FuturePerfectController
     project = Project.first
     if project
       project.update_attribute(:last_worked_at, Time.now)
-      puts "Work on #{project.name}, now!"
+      puts colorize("Work on #{project.name}, now!", GREEN)
+      Countdown.for(project.minutes_to_work)
     else
       puts "You must enter a project before you can start working"
     end

@@ -15,6 +15,8 @@ Project Status / TODO
 
   2. `Project.destroy_all` is not the ideal solution for test prep
   3. Implement data validations
+  4. We should be using assert\_includes
+  4. We should be using assert\_output
 
 Features
 --------

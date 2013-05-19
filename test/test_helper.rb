@@ -1,4 +1,4 @@
-require 'test/unit'
+require "minitest/autorun"
 require_relative '../bootstrap_ar'
 
 connect_to 'test'
