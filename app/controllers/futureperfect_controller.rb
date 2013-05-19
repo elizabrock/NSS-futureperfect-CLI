@@ -32,7 +32,7 @@ class FuturePerfectController
     project = Project.first
     if project
       project.update_attribute(:last_worked_at, Time.now)
-      puts colorize("#{project.name}", GREEN)
+      add_line colorize("#{project.name}", GREEN)
       Countdown.for(project.minutes_to_work)
     else
       puts "You must enter a project before you can start working"

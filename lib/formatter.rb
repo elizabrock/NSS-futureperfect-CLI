@@ -1,7 +1,10 @@
 module Formatter
+  @@output = []
+  @@first_draw = true
+
   BLACK   = 30
-  RED     = 31 
-  GREEN   = 32 
+  RED     = 31
+  GREEN   = 32
   YELLOW  = 33
   BLUE    = 34
   MAGENTA = 35
@@ -18,25 +21,47 @@ module Formatter
     puts BELL
   end
 
-  def clear_line
-    # Go to beginning of line, then erase to the end of the line
-    print "\e[1G"
-    erase_to_line_end
+  def redraw is_final_drawing = false
+    # move our command prompt to the top of the terminal window, by printing
+    # enough newlines to move it up there.
+    if @@first_draw
+      @@first_draw = false
+      print "\n" * (terminal_height - 2)
+    end
+
+    # move our cursor to the top of the terminal window
+    (terminal_height - 1).times { backtrack_line }
+
+    print "\n" + @@output.join("\n")
+
+    if is_final_drawing
+      print "\n" # So the prompt ends up on a fresh new line
+    else
+      fill_lines = (terminal_height - @@output.size - 2)
+      print "\n\e[K" * fill_lines
+    end
   end
 
-  def erase_to_line_end
-    print "\e[K"
+  def add_line text
+    @@output << text
+    redraw
+  end
+
+  def replace_line replacement_text
+    @@output[@@output.length - 1] = replacement_text
+    redraw
   end
 
   def backtrack_line
     print "\e[1A"
   end
 
-  def move_cursor_left total_characters = 64
-    print "\e[#{total_characters}D"
-  end
+  # "\e[1G"  go to beginning of line
+  # "\e[K" erase_to_line_end
+  # "\e[1D" moves cursor left
+  # "\e[1C" moves cursor right
 
-  def move_cursor_right total_characters = 1
-    print "\e[#{total_characters}C"
+  def terminal_height
+    `tput lines`.to_i
   end
 end

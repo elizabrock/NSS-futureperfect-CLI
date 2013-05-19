@@ -17,44 +17,34 @@ class Countdown
   def execute!
     end_time =  Time.now + total_time_in_seconds
 
-    print colorize( format_time(total_time_in_seconds), choose_color(total_time_in_seconds))
+    add_line colorize( format_time(total_time_in_seconds), choose_color(total_time_in_seconds))
 
     while Time.now < end_time
       time_remaining = end_time - Time.now
       current_status = colorize( format_time(time_remaining), choose_color(time_remaining))
 
-      clear_line
-      print current_status
-
-      STDOUT.flush
-      break if repl_quit?
+      replace_line current_status
+      repl
     end
-    puts colorize("Done!", BLUE)
+    add_line colorize("Done!", BLUE)
+    redraw :final
     ding!
   end
 
   private
 
-  # http://stackoverflow.com/questions/946738/detect-key-press-non-blocking-w-o-getc-gets-in-ruby
-  def repl_quit?
+  def repl
     # wait 1 sec for user input from STDIN
     result = IO.select([STDIN], nil, nil, 1)
     return false unless result && (result.first.first == STDIN)
 
-    # We're trying to get rid of the stray letter from
-    # the command the user typed in:
-    backtrack_line
-    move_cursor_right 8
-    erase_to_line_end
-
-    input = STDIN.readline #This comes with a newline attached
+    input = STDIN.readline #readline comes with the newline attached
     if input.include? 'q'
-      puts "\nQuitting.."
-      true
-    else #some other command..
-      print  clear_line
-      STDOUT.flush
-      false
+      add_line "Quitting.."
+      redraw :final
+      exit
+    else
+      # some other command that isn't implemented, ignore it.
     end
   end
 
