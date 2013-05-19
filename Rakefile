@@ -6,7 +6,7 @@ require 'yaml'
 
 require 'rake/testtask'
 Rake::TestTask.new( test: "db:test:prepare") do |t|
- t.libs << 'test'
+  t.pattern = "test/**/test_*.rb"
 end
 
 desc "Run tests"

@@ -1,4 +1,4 @@
-require 'test_helper'
+require_relative '../test_helper'
 
 class TestAddingProject < MiniTest::Unit::TestCase
   include DatabaseCleaner
