@@ -6,24 +6,16 @@ connect_to database
 
 # ARGV = [add, foo]
 command = ARGV[0]
+project_name = ARGV[1] # can be nil
 
+params = { command: command, project: { name: project_name } }
+controller = FuturePerfectController.new(params)
+
+# This is a router:
 if command == "add"
-  project_name = ARGV[1]
-  project = Project.new(name: project_name)
-  if project.save
-    puts "Success!"
-  else
-    puts "Failure :( #{project.errors.full_messages.join(", ")}"
-  end
+  controller.create
 elsif command == "list"
-  projects = Project.all
-  projects.each_with_index do |project, i|
-    puts "#{i+1}. #{project.name}"
-  end
+  controller.index
 elsif command == "remove"
-  project_name = ARGV[1]
-  matching_projects = Project.where(name: project_name).all
-  matching_projects.each do |project|
-    project.destroy
-  end
+  controller.destroy
 end
