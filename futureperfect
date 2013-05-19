@@ -18,4 +18,6 @@ elsif command == "list"
   controller.index
 elsif command == "remove"
   controller.destroy
+elsif command == "start"
+  controller.work
 end

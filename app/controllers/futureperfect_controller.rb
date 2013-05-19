@@ -27,6 +27,16 @@ class FuturePerfectController
     end
   end
 
+  def work
+    project = Project.first
+    if project
+      project.update_attribute(:last_worked_at, Time.now)
+      puts "Work on #{project.name}, now!"
+    else
+      puts "You must enter a project before you can start working"
+    end
+  end
+
   private
 
   def params
