@@ -17,6 +17,7 @@ Project Status / TODO
   3. Implement data validations
   4. We should be using assert\_includes
   4. We should be using assert\_output
+  5. Use OptionParser: http://ruby-doc.org/stdlib-2.0/libdoc/optparse/rdoc/OptionParser.html
 
 Features
 --------

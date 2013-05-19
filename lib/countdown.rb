@@ -18,36 +18,44 @@ class Countdown
     end_time =  Time.now + total_time_in_seconds
 
     print colorize( format_time(total_time_in_seconds), choose_color(total_time_in_seconds))
-    print fill
 
     while Time.now < end_time
       time_remaining = end_time - Time.now
-      print backtrack
-      print colorize( format_time(time_remaining), choose_color(time_remaining))
-      print fill
-      sleep 1
+      current_status = colorize( format_time(time_remaining), choose_color(time_remaining))
+
+      clear_line
+      print current_status
+
+      STDOUT.flush
+      break if repl_quit?
     end
-    print backtrack
     puts colorize("Done!", BLUE)
     ding!
   end
 
   private
 
-  def terminal_height
-    `tput lines`.to_i
-  end
+  # http://stackoverflow.com/questions/946738/detect-key-press-non-blocking-w-o-getc-gets-in-ruby
+  def repl_quit?
+    # wait 1 sec for user input from STDIN
+    result = IO.select([STDIN], nil, nil, 1)
+    return false unless result && (result.first.first == STDIN)
 
-  def backtrack
-     "\e[#{terminal_height - 2}A" + " " * 8 + "\e[#{8}D"
-  end
+    # We're trying to get rid of the stray letter from
+    # the command the user typed in:
+    backtrack_line
+    move_cursor_right 8
+    erase_to_line_end
 
-  def fill
-    output = ""
-    (terminal_height - 2).times do
-      output <<  "\n"
+    input = STDIN.readline #This comes with a newline attached
+    if input.include? 'q'
+      puts "\nQuitting.."
+      true
+    else #some other command..
+      print  clear_line
+      STDOUT.flush
+      false
     end
-    output
   end
 
   def format_time time
