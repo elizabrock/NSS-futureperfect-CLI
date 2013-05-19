@@ -19,4 +19,19 @@ class TestListingProjects < MiniTest::Unit::TestCase
 EOS
     assert_equal expected, actual
   end
+
+  def test_projects_are_listed_in_order_of_least_recently_worked
+    Project.create(name: 'foo', last_worked_at: 2.days.ago)
+    Project.create(name: 'bar', last_worked_at: 1.days.ago)
+    Project.create(name: 'grille', last_worked_at: Time.now)
+    Project.create(name: 'never', last_worked_at: nil)
+    actual = `ruby futureperfect list`
+    expected = <<EOS
+1. never
+2. foo
+3. bar
+4. grille
+EOS
+    assert_equal expected, actual
+  end
 end

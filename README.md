@@ -13,7 +13,6 @@ The goal of this project is to create a rotating task-list, similar to the [iOS 
 Project Status / TODO
 ---------------------
 
-  1. The tests should use a test database
   2. `Project.destroy_all` is not the ideal solution for test prep
   3. Implement data validations
 

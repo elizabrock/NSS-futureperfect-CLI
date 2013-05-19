@@ -14,7 +14,8 @@
 ActiveRecord::Schema.define(:version => 20130515112300) do
 
   create_table "projects", :force => true do |t|
-    t.string "name"
+    t.string   "name"
+    t.datetime "last_worked_at"
   end
 
 end
