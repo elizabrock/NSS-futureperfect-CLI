@@ -10,16 +10,11 @@ project_name = ARGV[1] # can be nil
 
 params = { command: command, project: { name: project_name } }
 controller = FuturePerfectController.new(params)
+routes = { "add" => :create, "list" => :index, "remove" => :destroy, "start" => :work }
 
 # This is a router:
-if command == "add"
-  controller.create
-elsif command == "list"
-  controller.index
-elsif command == "remove"
-  controller.destroy
-elsif command == "start"
-  controller.work
+if route = routes[command]
+  controller.send route
 else
   unless command == "help"
     puts "FuturePerfect does not (yet?) support the '#{command}' command.\n\n"
