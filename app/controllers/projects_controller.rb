@@ -1,30 +1,36 @@
-class FuturePerfectController
+class ProjectsController
   include Formatter
 
-  def initialize params
+  def initialize params, stdout = Kernel
     @params = params
+    @out = stdout
   end
 
   def index
     projects = Project.all
     projects.each_with_index do |project, i|
-      puts "#{i+1}. #{project.name}"
+      @out.puts "#{i+1}. #{project.name}"
     end
   end
 
   def create
     project = Project.new(params[:project])
     if project.save
-      puts "Success!"
+      @out.puts "Success!"
     else
-      puts "Failure :( #{project.errors.full_messages.join(", ")}"
+      @out.puts "Failure :( #{project.errors.full_messages.join(", ")}"
     end
   end
 
   def destroy
     matching_projects = Project.where(name: params[:project][:name]).all
-    matching_projects.each do |project|
-      project.destroy
+    if matching_projects.empty?
+      @out.puts "Project could not be found"
+    else
+      matching_projects.each do |project|
+        project.destroy
+      end
+      @out.puts "Success!"
     end
   end
 
@@ -35,7 +41,7 @@ class FuturePerfectController
       add_line colorize("#{project.name}", GREEN)
       Countdown.for(project.minutes_to_work)
     else
-      puts "You must enter a project before you can start working"
+      @out.puts "You must enter a project before you can start working"
     end
   end
 

@@ -9,7 +9,9 @@ command = ARGV[0]
 project_name = ARGV[1] # can be nil
 
 params = { command: command, project: { name: project_name } }
-controller = FuturePerfectController.new(params)
+
+controller = ProjectsController.new(params)
+
 routes = { "add" => :create, "list" => :index, "remove" => :destroy, "start" => :work }
 
 # This is a router:
