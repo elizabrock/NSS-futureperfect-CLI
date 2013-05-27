@@ -1,6 +1,11 @@
 module Formatter
+  @@out = Kernel
   @@output = []
   @@first_draw = true
+
+  def self.output_to out
+    @@out = out
+  end
 
   BLACK   = 30
   RED     = 31
@@ -18,7 +23,7 @@ module Formatter
   end
 
   def ding!
-    puts BELL
+    out.puts BELL
   end
 
   def redraw is_final_drawing = false
@@ -26,19 +31,18 @@ module Formatter
     # enough newlines to move it up there.
     if @@first_draw
       @@first_draw = false
-      print "\n" * (terminal_height - 2)
+      out.print "\n" * (terminal_height - 2)
     end
-
     # move our cursor to the top of the terminal window
-    (terminal_height - 1).times { backtrack_line }
+    (terminal_height - 1).times { out.print "\e[1A" }
 
-    print "\n" + @@output.join("\n")
+    out.print "\n" + @@output.join("\n")
 
     if is_final_drawing
-      print "\n" # So the prompt ends up on a fresh new line
+      out.print "\n" # So the prompt ends up on a fresh new line
     else
       fill_lines = (terminal_height - @@output.size - 2)
-      print "\n\e[K" * fill_lines
+      out.print "\n\e[K" * fill_lines
     end
   end
 
@@ -53,7 +57,7 @@ module Formatter
   end
 
   def backtrack_line
-    print "\e[1A"
+    out.print "\e[1A"
   end
 
   # "\e[1G"  go to beginning of line
@@ -63,5 +67,11 @@ module Formatter
 
   def terminal_height
     `tput lines`.to_i
+  end
+
+  private
+
+  def out
+    @@out
   end
 end

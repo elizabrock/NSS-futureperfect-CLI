@@ -1,27 +1,38 @@
 #!/usr/bin/env ruby
 
 require_relative 'bootstrap_ar'
-database = ENV['FP_ENV'] || 'development'
-connect_to database
+require 'active_support/inflector'
 
-# ARGV = [add, foo]
-command = ARGV[0]
-project_name = ARGV[1] # can be nil
+class FuturePerfect
+  include ActiveSupport::Inflector
 
-params = { command: command, project: { name: project_name } }
-
-controller = ProjectsController.new(params)
-
-routes = { "add" => :create, "list" => :index, "remove" => :destroy, "start" => :work }
-
-# This is a router:
-if route = routes[command]
-  controller.send route
-else
-  unless command == "help"
-    puts "FuturePerfect does not (yet?) support the '#{command}' command.\n\n"
+  def initialize
+    database = ENV['FP_ENV'] || 'development'
+    connect_to database
   end
-  puts <<EOS
+
+  def execute( command, project_name)
+    # This is a router:
+    routes = { "add" => { controller: :projects, action: :create },
+              "list" => { controller: :projects, action: :index },
+              "remove" => { controller: :projects, action: :destroy },
+              "start" => { controller: :work, action: :work } }
+
+    params = { command: command }
+    if project_name
+      params[:project] = { name: project_name }
+    end
+
+    if route = routes[command]
+      controller_name = "#{route[:controller]}_controller"
+      controller_class = constantize(classify(controller_name))
+      controller = controller_class.new(params)
+      controller.send route[:action]
+    else
+      unless command == "help"
+        puts "FuturePerfect does not (yet?) support the '#{command}' command.\n\n"
+      end
+      puts <<EOS
 Currently supported commands are:
 * futureperfect list
 * futureperfect add <project_name>
@@ -30,4 +41,12 @@ Currently supported commands are:
 
 See the README for more details
 EOS
+    end
+  end
 end
+
+# ARGV = [add, foo]
+command = ARGV[0]
+project_name = ARGV[1] # can be nil
+
+FuturePerfect.new.execute(command, project_name)
