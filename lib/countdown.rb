@@ -8,6 +8,7 @@ class Countdown
 
   def self.for total_time_in_minutes
     countdown = Countdown.new(total_time_in_minutes)
+
     countdown.countdown
   end
 
@@ -20,18 +21,15 @@ class Countdown
     @end_time - Time.now
   end
 
-  def output_introduction
-  end
-
   def countdown
     add_line "Starting" #This line will be overwritten
-
-    input = callcc {|continuation| @input_continuation = continuation }
+    input_continuation = nil
+    input = callcc {|continuation| input_continuation = continuation }
     process input
 
     until time_remaining <= 0
       tick
-      check_for_input #Extract this next!
+      FuturePerfect.check_for_input input_continuation
     end
     output_conclusion
   end
@@ -45,15 +43,6 @@ class Countdown
     add_line colorize("Done!", BLUE)
     redraw :final
     ding!
-  end
-
-  def check_for_input
-    # wait 1 sec for user input from STDIN
-    result = IO.select([STDIN], nil, nil, 1)
-    return unless result && (result.first.first == STDIN)
-
-    input = STDIN.readline #readline comes with the newline attached
-    @input_continuation.call input
   end
 
   def process input
