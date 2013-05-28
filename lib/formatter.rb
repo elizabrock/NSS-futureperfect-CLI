@@ -36,7 +36,10 @@ module Formatter
     # move our cursor to the top of the terminal window
     (terminal_height - 1).times { out.print "\e[1A" }
 
-    out.print "\n" + @@output.join("\n")
+    # \e[K clears the line before we print our new contents on top of it.
+    # This prevents the 'ghosting' effect, where some of the old content is
+    # still visible.
+    out.print "\n\e[K" + @@output.join("\n\e[K")
 
     if is_final_drawing
       out.print "\n" # So the prompt ends up on a fresh new line

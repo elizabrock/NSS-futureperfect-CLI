@@ -4,13 +4,7 @@ require 'continuation'
 class Countdown
   include Formatter
 
-  attr_accessor :total_time_in_seconds
-
-  def self.for total_time_in_minutes
-    countdown = Countdown.new(total_time_in_minutes)
-
-    countdown.countdown
-  end
+  attr_reader :total_time_in_seconds
 
   def initialize total_time_in_minutes
     @total_time_in_seconds = total_time_in_minutes * 60
@@ -21,15 +15,15 @@ class Countdown
     @end_time - Time.now
   end
 
-  def countdown
-    add_line "Starting" #This line will be overwritten
-    input_continuation = nil
-    input = callcc {|continuation| input_continuation = continuation }
-    process input
+  def countdown_with &continuation_block
+    if @paused
+      replace_line "Paused.. Press 'q' to quit, or 'p' to resume"
+      loop{ yield continuation_block }
+    end
 
     until time_remaining <= 0
       tick
-      FuturePerfect.check_for_input input_continuation
+      yield continuation_block
     end
     output_conclusion
   end
@@ -45,14 +39,21 @@ class Countdown
     ding!
   end
 
-  def process input
-    return unless input.is_a? String
-    if input.include? 'q'
-      @end_time = Time.now
+  def stop!
+    @end_time = Time.now
+  end
+
+  def paused?
+    @paused
+  end
+
+  def toggle_pause!
+    if @paused
+      @paused = false
+      @end_time = Time.now + @time_remaining
     else
-      # some other command that isn't implemented, ignore it.
-      add_line "Command '#{input.strip}' is not supported"
-      add_line "Cont..."
+      @paused = true
+      @time_remaining = time_remaining
     end
   end
 

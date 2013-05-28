@@ -10,7 +10,7 @@ describe "WorkController" do
     describe "when there are no projects" do
       it "gives an error message" do
         assert Project.all.empty?
-        controller.work
+        controller.work_repl
         stdout.rewind
         assert_includes stdout.read, "You must enter a project before you can start working"
       end
@@ -21,7 +21,7 @@ describe "WorkController" do
         Project.create(name: 'bar', last_worked_at: 1.days.ago)
         Project.create(name: 'grille', last_worked_at: Time.now)
         @next_project = Project.create(name: 'never', last_worked_at: nil)
-        controller.work
+        controller.work_repl
       end
       it "starts the least recently worked project" do
         stdout.rewind

@@ -17,7 +17,7 @@ class FuturePerfect
     routes = { "add" => { controller: :projects, action: :create },
               "list" => { controller: :projects, action: :index },
               "remove" => { controller: :projects, action: :destroy },
-              "start" => { controller: :work, action: :work } }
+              "start" => { controller: :work, action: :work_repl } }
 
     params = { command: command }
     if project_name
