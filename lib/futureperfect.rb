@@ -1,14 +1,9 @@
 require 'active_support/inflector'
 
+include ActiveSupport::Inflector
+
 class FuturePerfect
-  include ActiveSupport::Inflector
-
-  def initialize
-    database = ENV['FP_ENV'] || 'development'
-    connect_to database
-  end
-
-  def execute( command, project_name)
+  def self.route( command, project_name)
     # This is a router:
     routes = { "add" => { controller: :projects, action: :create },
               "list" => { controller: :projects, action: :index },

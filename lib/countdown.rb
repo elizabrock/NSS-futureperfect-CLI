@@ -1,4 +1,5 @@
 require_relative 'formatter'
+require 'continuation'
 
 class Countdown
   include Formatter
@@ -7,46 +8,66 @@ class Countdown
 
   def self.for total_time_in_minutes
     countdown = Countdown.new(total_time_in_minutes)
-    countdown.execute!
+    countdown.countdown
   end
 
   def initialize total_time_in_minutes
     @total_time_in_seconds = total_time_in_minutes * 60
+    @end_time =  Time.now + total_time_in_seconds
   end
 
-  def execute!
-    end_time =  Time.now + total_time_in_seconds
+  def time_remaining
+    @end_time - Time.now
+  end
 
-    add_line colorize( format_time(total_time_in_seconds), choose_color(total_time_in_seconds))
+  def output_introduction
+  end
 
-    while Time.now < end_time
-      time_remaining = end_time - Time.now
-      current_status = colorize( format_time(time_remaining), choose_color(time_remaining))
+  def countdown
+    add_line "Starting" #This line will be overwritten
 
-      replace_line current_status
-      repl
+    input = callcc {|continuation| @input_continuation = continuation }
+    process input
+
+    until time_remaining <= 0
+      tick
+      check_for_input #Extract this next!
     end
+    output_conclusion
+  end
+
+  def tick
+    current_status = colorize( format_time(time_remaining), choose_color(time_remaining))
+    replace_line current_status
+  end
+
+  def output_conclusion
     add_line colorize("Done!", BLUE)
     redraw :final
     ding!
   end
 
-  private
-
-  def repl
+  def check_for_input
     # wait 1 sec for user input from STDIN
     result = IO.select([STDIN], nil, nil, 1)
-    return false unless result && (result.first.first == STDIN)
+    return unless result && (result.first.first == STDIN)
 
     input = STDIN.readline #readline comes with the newline attached
+    @input_continuation.call input
+  end
+
+  def process input
+    return unless input.is_a? String
     if input.include? 'q'
-      add_line "Quitting.."
-      redraw :final
-      exit
+      @end_time = Time.now
     else
       # some other command that isn't implemented, ignore it.
+      add_line "Command '#{input.strip}' is not supported"
+      add_line "Cont..."
     end
   end
+
+  private
 
   def format_time time
     seconds = time % 60

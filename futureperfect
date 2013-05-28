@@ -1,8 +1,10 @@
 #!/usr/bin/env ruby
 
 require_relative 'bootstrap_ar'
+database = ENV['FP_ENV'] || 'development'
+connect_to database
 
 command = ARGV[0]
 project_name = ARGV[1] # can be nil
 
-FuturePerfect.new.execute(command, project_name)
+FuturePerfect.route(command, project_name)
