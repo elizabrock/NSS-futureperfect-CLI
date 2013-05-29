@@ -14,7 +14,6 @@ Project Status / TODO
 ---------------------
 
   2. `Project.destroy_all` is not the ideal solution for test prep
-  3. Implement data validations
   4. We should be using assert\_includes
   4. We should be using assert\_output
   5. Use OptionParser: http://ruby-doc.org/stdlib-2.0/libdoc/optparse/rdoc/OptionParser.html
@@ -22,6 +21,18 @@ Project Status / TODO
 Features
 --------
 The main features of the futureperfect CLI will be that the tasks rotate until completed
+
+Implementation
+--------------
+
+This project uses continuations for control flow in the repl.  I like it.
+
+Some references on continuations in ruby, for the interested:
+* [Continuation Passing Style on c2.com](http://c2.com/cgi/wiki?ContinuationPassingStyle)
+* [Continuations and Ruby](http://blog.mostof.it/continuations-and-ruby/)
+* [Demystifying Continuations in Ruby](http://gnuu.org/2009/03/21/demystifying-continuations-in-ruby/)
+* [Call with Current Continuation on Wikipedia](http://en.wikipedia.org/wiki/Call-with-current-continuation)
+* [An argument against call/cc](http://okmij.org/ftp/continuations/against-callcc.html)
 
 Usage Instructions
 ------------------
@@ -55,14 +66,11 @@ While working through tasks, press:
 
 Demo
 ----
-
 To demo the app, you'll have to download it and try it yourself.
 
 Known Bugs
 ----------
-The great joy of having no code is having no bugs, no?
-
-j/k.  Requirements bugs are *everywhere*.
+None known at this time.
 
 Author
 ------
