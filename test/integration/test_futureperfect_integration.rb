@@ -31,9 +31,9 @@ EOS
     Project.create(name: 'grille', last_worked_at: Time.now)
     Project.create(name: 'never', last_worked_at: nil)
     actual = `ruby futureperfect start`
-    assert actual.include?( "never" ), "Should have been 'never', was: '#{actual}'"
+    assert_includes actual, "never"
     actual = `ruby futureperfect start`
-    assert actual.include?( "foo" ), "Should have been 'foo', was: '#{actual}'"
+    assert_includes actual, "foo"
   end
 
   def test_work_on_particular_projects

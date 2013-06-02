@@ -17,7 +17,6 @@ Project Status / TODO
 [![Coverage Status](https://coveralls.io/repos/elizabrock/NSS-futureperfect-CLI/badge.png)](https://coveralls.io/r/elizabrock/NSS-futureperfect-CLI)
 
   2. `Project.destroy_all` is not the ideal solution for test prep
-  4. We should be using assert\_includes
   4. We should be using assert\_output
   5. Use OptionParser: http://ruby-doc.org/stdlib-2.0/libdoc/optparse/rdoc/OptionParser.html
   6. We should have the title bar update itself with the active countdown
