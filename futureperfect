@@ -1,5 +1,16 @@
 #!/usr/bin/env ruby
 
+# For coveralls:
+if ENV['FP_ENV'] == 'test'
+  require 'simplecov'
+  require 'coveralls'
+  Coveralls::Output.silent = true
+  SimpleCov.start do
+    formatter Coveralls::SimpleCov::Formatter
+    command_name "tests"
+  end
+end
+
 require_relative 'bootstrap_ar'
 database = ENV['FP_ENV'] || 'development'
 connect_to database

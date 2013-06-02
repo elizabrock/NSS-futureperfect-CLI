@@ -1,4 +1,5 @@
 require 'coveralls'
+Coveralls::Output.silent = true
 Coveralls.wear!
 
 require "minitest/autorun"
