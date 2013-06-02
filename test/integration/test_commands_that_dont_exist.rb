@@ -17,7 +17,7 @@ class TestCommandsThatDontExist < MiniTest::Unit::TestCase
   end
 
   def test_help_message_is_printed_with_help_command
-    output = `ruby futureperfect foo help`
+    output = `ruby futureperfect help`
     ["list", "add", "remove", "start"].each do |command|
       assert_includes output, command
     end

@@ -30,9 +30,9 @@ EOS
     Project.create(name: 'bar', last_worked_at: 1.days.ago)
     Project.create(name: 'grille', last_worked_at: Time.now)
     Project.create(name: 'never', last_worked_at: nil)
-    actual = `ruby futureperfect start`
+    actual = run_and_q "ruby futureperfect start"
     assert_includes actual, "never"
-    actual = `ruby futureperfect start`
+    actual = run_and_q "ruby futureperfect start"
     assert_includes actual, "foo"
   end
 
@@ -41,10 +41,10 @@ EOS
     Project.create(name: 'bar', last_worked_at: 1.days.ago)
     Project.create(name: 'grille', last_worked_at: Time.now)
     Project.create(name: 'never', last_worked_at: nil)
-    actual = `ruby futureperfect start bar`
+    actual = run_and_q "ruby futureperfect start bar"
     assert_includes actual, "bar"
     # On the next run, continues where we left off
-    actual = `ruby futureperfect start`
+    actual = run_and_q "ruby futureperfect start"
     assert_includes actual, "never"
   end
 end

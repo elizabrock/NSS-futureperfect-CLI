@@ -26,9 +26,6 @@ class WorkController
       input = callcc { |continuation| input_continuation = continuation }
       process_input_for input, countdown, next_project_cc
 
-      # look_for_input = Proc.new{ FuturePerfect.check_for_input input_continuation }
-      # countdown.countdown_with &look_for_input
-
       countdown.countdown_with do
         FuturePerfect.check_for_input input_continuation
       end

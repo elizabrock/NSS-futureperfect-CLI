@@ -4,6 +4,6 @@ class Project < ActiveRecord::Base
   default_scope order("last_worked_at ASC, id ASC")
 
   def minutes_to_work
-    ENV['FP_ENV'] == 'test' ? 0 : 30
+    ENV['FP_ENV'] == 'test' ? 1 : 30
   end
 end
