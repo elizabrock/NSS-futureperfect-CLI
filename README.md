@@ -20,6 +20,8 @@ Project Status / TODO
   4. We should be using assert\_includes
   4. We should be using assert\_output
   5. Use OptionParser: http://ruby-doc.org/stdlib-2.0/libdoc/optparse/rdoc/OptionParser.html
+  6. We should have the title bar update itself with the active countdown
+  7. Formatter as singleton?
 
 Features
 --------

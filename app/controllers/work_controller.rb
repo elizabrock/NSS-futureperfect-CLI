@@ -14,7 +14,7 @@ class WorkController
   end
 
   def work_next_project! next_project_cc
-    project = Project.first
+    project = next_project
     if project
       project.update_attribute(:last_worked_at, Time.now)
       countdown = Countdown.new(project.minutes_to_work)
@@ -53,6 +53,14 @@ class WorkController
   end
 
   private
+
+  def next_project
+    if params[:project]
+      next_project = Project.find_by_name(params[:project][:name])
+      params.delete(:project)
+    end
+    next_project || Project.first
+  end
 
   def params
     @params
