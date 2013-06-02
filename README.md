@@ -14,6 +14,7 @@ Project Status / TODO
 ---------------------
 
 [![Build Status](https://travis-ci.org/elizabrock/NSS-futureperfect-CLI.png)](https://travis-ci.org/elizabrock/NSS-futureperfect-CLI)
+[![Coverage Status](https://coveralls.io/repos/elizabrock/NSS-futureperfect-CLI/badge.png)](https://coveralls.io/r/elizabrock/NSS-futureperfect-CLI)
 
   2. `Project.destroy_all` is not the ideal solution for test prep
   4. We should be using assert\_includes
