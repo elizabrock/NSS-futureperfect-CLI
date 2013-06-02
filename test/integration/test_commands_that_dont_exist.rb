@@ -12,7 +12,7 @@ class TestCommandsThatDontExist < MiniTest::Unit::TestCase
 
   def test_user_sees_error_message
     output = `ruby futureperfect foo foo`
-    message = "FuturePerfect does not (yet?) support the 'foo' command."
+    message = "FuturePerfect does not support the 'foo' command."
     assert output.include?(message), "Output was '#{output}', but should have included '#{message}'"
   end
 
@@ -25,7 +25,7 @@ class TestCommandsThatDontExist < MiniTest::Unit::TestCase
 
   def test_help_command_doesnt_print_error_message
     output = `ruby futureperfect help`
-    message = "FuturePerfect does not (yet?) support"
+    message = "FuturePerfect does not support"
     assert !output.include?(message), "Output was '#{output}', but should have included '#{message}'"
   end
 end

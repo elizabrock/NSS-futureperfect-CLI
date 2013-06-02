@@ -31,7 +31,7 @@ class FuturePerfect
       controller.send route[:action]
     else
       unless command == "help"
-        puts "FuturePerfect does not (yet?) support the '#{command}' command.\n\n"
+        puts "FuturePerfect does not support the '#{command}' command.\n\n"
       end
       puts <<EOS
 Currently supported commands are:
