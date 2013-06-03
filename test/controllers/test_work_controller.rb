@@ -20,8 +20,7 @@ describe "WorkController" do
         Project.create(name: 'foo', last_worked_at: 2.days.ago)
         Project.create(name: 'bar', last_worked_at: 1.days.ago)
         Project.create(name: 'grille', last_worked_at: Time.now)
-        @next_project = Project.create(name: 'never', last_worked_at: nil)
-        Project.any_instance.expects(:minutes_to_work).returns(0)
+        @next_project = Project.create(name: 'never', last_worked_at: nil, minutes_to_work: 0)
         controller.work_repl
       end
       it "starts the least recently worked project" do

@@ -11,11 +11,12 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20130515112300) do
+ActiveRecord::Schema.define(:version => 20130602160500) do
 
   create_table "projects", :force => true do |t|
     t.string   "name"
     t.datetime "last_worked_at"
+    t.integer  "minutes_to_work", :default => 30
   end
 
 end

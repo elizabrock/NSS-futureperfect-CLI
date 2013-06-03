@@ -3,7 +3,6 @@ require 'coveralls'
 # Coveralls.wear!
 
 require "minitest/autorun"
-require 'mocha/setup'
 require_relative '../bootstrap_ar'
 
 connect_to 'test'
