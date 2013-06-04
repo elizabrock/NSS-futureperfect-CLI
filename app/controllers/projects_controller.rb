@@ -7,8 +7,18 @@ class ProjectsController
 
   def index
     projects = Project.all
+    return if projects.empty?
+    project_name_lengths = projects.collect{ |p| p.name.length + 4 }
+    project_name_lengths << 9 # minimum length
+    projects_width = project_name_lengths.max
+    @out.puts " #   " + "project".ljust(projects_width) + "  time  last worked"
+    @out.puts "---  " + ("-" * projects_width)             + "  ----  -----------"
     projects.each_with_index do |project, i|
-      @out.puts "#{i+1}. #{project.name}"
+      position = (i + 1).to_s.rjust(2)
+      name = project.name.ljust(projects_width)
+      last_worked = project.last_worked_at.try(:strftime, "%m/%d %H:%M")
+
+      @out.puts "#{position}.  #{name}   #{project.minutes_to_work}   #{last_worked}"
     end
   end
 

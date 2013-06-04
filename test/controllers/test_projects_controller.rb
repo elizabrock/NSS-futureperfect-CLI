@@ -23,8 +23,10 @@ describe "ProjectsController" do
       it "outputs the full list" do
         controller.index
         expected = <<EOS
-1. foo
-2. bar
+ #   project    time  last worked
+---  ---------  ----  -----------
+ 1.  foo         30   
+ 2.  bar         30   
 EOS
         stdout.rewind
         assert_equal expected, stdout.read
@@ -32,17 +34,19 @@ EOS
     end
     describe "when some of the projects have been worked on" do
       before do
-        Project.create(name: 'foo', last_worked_at: 2.days.ago)
-        Project.create(name: 'bar', last_worked_at: 1.days.ago)
-        Project.create(name: 'grille', last_worked_at: Time.now)
+        Project.create(name: 'foo', last_worked_at: Date.parse("2013/05/01 00:00:00"))
+        Project.create(name: 'bar', last_worked_at: Date.parse("2013/05/02 00:00:00"))
+        Project.create(name: 'grille', last_worked_at: Date.parse("2013/05/03 00:00:00"))
         Project.create(name: 'never', last_worked_at: nil)
       end
       it "lists them in order of least recently worked" do
         expected = <<EOS
-1. never
-2. foo
-3. bar
-4. grille
+ #   project     time  last worked
+---  ----------  ----  -----------
+ 1.  never        30   
+ 2.  foo          30   05/01 00:00
+ 3.  bar          30   05/02 00:00
+ 4.  grille       30   05/03 00:00
 EOS
         controller.index
         stdout.rewind

@@ -13,8 +13,10 @@ class TestFuturePerfectIntegration < MiniTest::Unit::TestCase
     Project.create(name: 'bar')
     actual = `ruby futureperfect list`
     expected = <<EOS
-1. foo
-2. bar
+ #   project    time  last worked
+---  ---------  ----  -----------
+ 1.  foo         30   
+ 2.  bar         30   
 EOS
     assert_equal expected, actual
   end
