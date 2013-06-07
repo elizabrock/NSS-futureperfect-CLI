@@ -1,13 +1,8 @@
-require 'coveralls'
-# Coveralls::Output.silent = true
-# Coveralls.wear!
-
 require "minitest/autorun"
-require_relative '../bootstrap_ar'
-
-connect_to 'test'
 
 ENV['FP_ENV'] = 'test'
+require_relative '../bootstrap_ar'
+connect_to 'test'
 
 def run_and_q command
   IO.popen(command, 'r+') do |pipe|
