@@ -6,19 +6,26 @@ class ProjectsController
   end
 
   def index
-    projects = Project.all
+    workable_projects = Project.workable
+    skipped_projects = Project.skipped
+    projects = workable_projects + skipped_projects
     return if projects.empty?
     project_name_lengths = projects.collect{ |p| p.name.length + 4 }
     project_name_lengths << 9 # minimum length
     projects_width = project_name_lengths.max
+
     @out.puts " #   " + "project".ljust(projects_width) + "  time  last worked"
     @out.puts "---  " + ("-" * projects_width)             + "  ----  -----------"
+
     projects.each_with_index do |project, i|
       position = (i + 1).to_s.rjust(2)
       name = project.name.ljust(projects_width)
-      last_worked = project.last_worked_at.try(:strftime, "%m/%d %H:%M")
+      worked_at_status = project.last_worked_at.try(:strftime, "%m/%d %H:%M")
+      if project.skip_until and project.skip_until > Time.now
+        worked_at_status = "(skipped)"
+      end
 
-      @out.puts "#{position}.  #{name}   #{project.minutes_to_work}   #{last_worked}"
+      @out.puts "#{position}.  #{name}   #{project.minutes_to_work}   #{worked_at_status}"
     end
   end
 

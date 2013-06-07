@@ -53,6 +53,33 @@ EOS
         assert_equal expected, stdout.read
       end
     end
+    describe "when some of the projects have been skipped" do
+      before do
+        Project.create(name: 'foo skip', last_worked_at: Date.parse("2013/05/01 00:00:00"), skip_until: (Date.today + 3))
+        Project.create(name: 'foo is ready', last_worked_at: Date.parse("2013/04/29 00:00:00"), skip_until: (Date.today - 1))
+        Project.create(name: 'foo', last_worked_at: Date.parse("2013/05/01 00:00:00"))
+        Project.create(name: 'bar', last_worked_at: Date.parse("2013/05/02 00:00:00"))
+        Project.create(name: 'grille', last_worked_at: Date.parse("2013/05/03 00:00:00"))
+        Project.create(name: 'never', last_worked_at: nil)
+        Project.create(name: 'never ever', last_worked_at: nil, skip_until: (Time.now + (60*60)))
+      end
+      it "should place those items last unless they are ready to be worked" do
+        expected = <<EOS
+ #   project           time  last worked
+---  ----------------  ----  -----------
+ 1.  never              30   
+ 2.  foo is ready       30   04/29 00:00
+ 3.  foo                30   05/01 00:00
+ 4.  bar                30   05/02 00:00
+ 5.  grille             30   05/03 00:00
+ 6.  never ever         30   (skipped)
+ 7.  foo skip           30   (skipped)
+EOS
+        controller.index
+        stdout.rewind
+        assert_equal expected, stdout.read
+      end
+    end
   end
 
   describe "#create" do
