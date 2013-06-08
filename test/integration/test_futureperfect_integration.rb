@@ -14,13 +14,11 @@ class TestFuturePerfectIntegration < MiniTest::Unit::TestCase
     actual = `ruby futureperfect list`
     # Adding the coveralls output to my test so I can check something out.
     expected = <<EOS
-[Coveralls] Set up the SimpleCov formatter.
 [Coveralls] Using SimpleCov's default settings.
  #   project    time  last worked
 ---  ---------  ----  -----------
  1.  foo         30   
  2.  bar         30   
-[Coveralls] Outside the Travis environment, not sending data.
 EOS
     # expected = <<EOS
  # #   project    time  last worked
