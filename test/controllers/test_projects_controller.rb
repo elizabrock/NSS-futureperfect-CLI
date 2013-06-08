@@ -59,11 +59,12 @@ EOS
         Project.create(name: 'foo is ready', last_worked_at: Date.parse("2013/04/29 00:00:00"), skip_until: (Date.today - 1))
         Project.create(name: 'foo', last_worked_at: Date.parse("2013/05/01 00:00:00"))
         Project.create(name: 'bar', last_worked_at: Date.parse("2013/05/02 00:00:00"))
-        Project.create(name: 'grille', last_worked_at: Date.parse("2013/05/03 00:00:00"))
+        Project.create(name: 'grille', last_worked_at: Date.today.beginning_of_day)
         Project.create(name: 'never', last_worked_at: nil)
         Project.create(name: 'never ever', last_worked_at: nil, skip_until: (Time.now + (60*60)))
       end
       it "should place those items last unless they are ready to be worked" do
+        today = Date.today.beginning_of_day.try(:strftime, "%m/%d %H:%M")
         expected = <<EOS
  #   project           time  last worked
 ---  ----------------  ----  -----------
@@ -71,9 +72,9 @@ EOS
  2.  foo is ready       30   04/29 00:00
  3.  foo                30   05/01 00:00
  4.  bar                30   05/02 00:00
- 5.  grille             30   05/03 00:00
- 6.  never ever         30   (skipped)
- 7.  foo skip           30   (skipped)
+ 5.  never ever         30   (skipped)
+ 6.  foo skip           30   (skipped)
+ 7.  grille             30   #{today}
 EOS
         controller.index
         stdout.rewind

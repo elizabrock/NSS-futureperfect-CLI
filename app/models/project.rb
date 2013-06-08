@@ -3,8 +3,7 @@ class Project < ActiveRecord::Base
   validates_uniqueness_of :name, message: "must be unique"
 
   default_scope order("last_worked_at ASC, id ASC")
-  scope :skipped, lambda{ where("skip_until > ?", Time.now) }
-  scope :workable, lambda{ where("skip_until IS NULL OR skip_until < ?", Time.now) }
+  scope :unworkable, lambda{ where("skip_until > ? OR last_worked_at >= ?", Time.now, Date.today - 1) }
   scope :workable, lambda{ where("skip_until IS NULL OR skip_until < ?", Time.now).where("last_worked_at IS NULL OR last_worked_at < ?", Date.today - 1) }
 
   def countdown

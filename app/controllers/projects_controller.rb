@@ -7,8 +7,8 @@ class ProjectsController
 
   def index
     workable_projects = Project.workable
-    skipped_projects = Project.skipped
-    projects = workable_projects + skipped_projects
+    unworkable_projects = Project.unworkable
+    projects = workable_projects + unworkable_projects
     return if projects.empty?
     project_name_lengths = projects.collect{ |p| p.name.length + 4 }
     project_name_lengths << 9 # minimum length
