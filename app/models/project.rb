@@ -5,14 +5,14 @@ class Project < ActiveRecord::Base
   default_scope order("last_worked_at ASC, id ASC")
   scope :skipped, lambda{ where("skip_until > ?", Time.now) }
   scope :workable, lambda{ where("skip_until IS NULL OR skip_until < ?", Time.now) }
+  scope :workable, lambda{ where("skip_until IS NULL OR skip_until < ?", Time.now).where("last_worked_at IS NULL OR last_worked_at < ?", Date.today - 1) }
 
   def countdown
     @countdown ||= Countdown.new(minutes_to_work)
   end
 
   def stop_working! opts = {}
-    # countdown.stop!
-    if opts.has_key?(:skipped) and opts[:skipped]
+    if opts[:skipped]
       process_skipped!
     else
       process_worked!

@@ -26,9 +26,14 @@ class WorkController
       work_repl quit_cc
       quit_cc.call unless continue_indefinitely
 
-      add_line "Do you wish to continue? Press any key to continue or 'q' to quit"
-      input = STDIN.gets
-      quit_cc.call if input.include? 'q'
+      if Project.workable.empty?
+        add_line "All your work is done.  Goodbye!"
+        quit_cc.call
+      else
+        add_line "Do you wish to continue? Press any key to continue or 'q' to quit"
+        input = STDIN.gets
+        quit_cc.call if input.include? 'q'
+      end
     }
   end
 

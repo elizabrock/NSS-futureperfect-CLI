@@ -51,6 +51,7 @@ class TestWorkingOnProject < MiniTest::Unit::TestCase
   def test_end_of_countdown_prompts_for_c_or_q
     foo = Project.create!(name: "Foo", minutes_to_work: 0)
     bar = Project.create!(name: "Bar", minutes_to_work: 0)
+    bar = Project.create!(name: "Zed", minutes_to_work: 0)
     shell_output = ""
     IO.popen('./futureperfect start', 'r+') do |pipe|
       # starts on Foo, finishes Foo and prompts for c/q
@@ -62,5 +63,22 @@ class TestWorkingOnProject < MiniTest::Unit::TestCase
     end
 
     assert_includes_in_order shell_output, "Foo", "Do you wish to continue? Press any key to continue or 'q' to quit", "Bar", "Do you wish to continue? Press any key to continue or 'q' to quit", "Done!"
+  end
+
+  def test_end_of_countdown_ends_if_all_work_is_completed
+    foo = Project.create!(name: "Foo", minutes_to_work: 0, skip_until: Date.today + 1)
+    bar = Project.create!(name: "Bar", minutes_to_work: 0, last_worked_at: Time.now - (23*60*60))
+    bar = Project.create!(name: "Grille", minutes_to_work: 0)
+    bar = Project.create!(name: "Zed", minutes_to_work: 0)
+    shell_output = ""
+    IO.popen('./futureperfect start', 'r+') do |pipe|
+      # starts on Grille, finishes Grille and prompts for c/q
+      pipe.puts("c")
+      # should continue to Zed, finish Zed, and quits with exit message
+      pipe.close_write
+      shell_output = pipe.read
+    end
+
+    assert_includes_in_order shell_output, "Grille", "Do you wish to continue? Press any key to continue or 'q' to quit", "Zed", "All your work is done.  Goodbye!"
   end
 end
