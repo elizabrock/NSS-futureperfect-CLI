@@ -1,16 +1,8 @@
-require "minitest/autorun"
-
-if ENV['FP_ENV'] == 'test'
-  require 'simplecov'
-  require 'coveralls'
-  Coveralls::Output.silent = true
-  SimpleCov.start do
-    formatter Coveralls::SimpleCov::Formatter
-    command_name "Unit Tests"
-  end
-end
+require 'coveralls'
+Coveralls.wear!
 
 ENV['FP_ENV'] = 'test'
+require "minitest/autorun"
 require_relative '../bootstrap_ar'
 connect_to 'test'
 
