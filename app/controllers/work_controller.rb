@@ -9,20 +9,27 @@ class WorkController
     Formatter.output_to stdout
   end
 
-  def start
-    if Project.count < 1
-      @out.puts "You must enter a project before you can start working"
+  def start continue_indefinitely = true
+    if Project.workable.empty?
+      add_line "You must enter a project before you can start working"
       return
     end
 
     quit_cc = nil
     quit = !callcc { |continuation| quit_cc = continuation }
     if quit
-      @out.puts("Done!")
+      add_line colorize("Done!", BLUE)
       return
     end
 
-    work_repl quit_cc
+    loop {
+      work_repl quit_cc
+      quit_cc.call unless continue_indefinitely
+
+      add_line "Do you wish to continue? Press any key to continue or 'q' to quit"
+      input = STDIN.gets
+      quit_cc.call if input.include? 'q'
+    }
   end
 
   private
@@ -35,7 +42,7 @@ class WorkController
 
   def work_project! project, next_project_cc, quit_cc
     add_line colorize(project.name, GREEN)
-    add_line "" #This line will be overwritten
+    add_line "This line will be overwritten" #This line will be overwritten
 
     input_continuation = nil
     input = callcc { |continuation| input_continuation = continuation }
@@ -50,24 +57,23 @@ class WorkController
   def process_input_for input, project, next_project_cc, quit_cc
     return unless input.is_a? String
     if input.include? 'q'
-      add_line "Quitting #{project.name}"
+      reset_with_message "Quitting #{project.name}", :no_pause
       project.stop_working! skipped: true
       quit_cc.call
     elsif input.include? 's'
-      add_line "Skipping #{project.name}"
+      reset_with_message "Skipping #{project.name}"
       project.stop_working! skipped: true
       next_project_cc.call
     elsif input.include? 'n'
-      add_line "Done with #{project.name} early"
+      reset_with_message "Done with #{project.name} early"
       project.stop_working! skipped: false
       next_project_cc.call
     elsif input.include? 'p'
       replace_line "Paused.. Press 'q' to quit, or 'p' to resume"
       project.countdown.toggle_pause!
     else
-      # some other command that isn't implemented, ignore it.
-      add_line "Command '#{input.strip}' is not supported"
-      add_line "Cont..."
+      replace_line "Command '#{input.strip}' is not supported"
+      sleep 1
     end
   end
 

@@ -12,21 +12,14 @@ def run_and_q command
   end
 end
 
-def strip_control_characters(string)
-  string = string.gsub(/(\n)|(\[\d+\w)|(\[\w)/,"")
-  string.chars.inject("") do |str, char|
-    unless char.ascii_only? and (char.ord < 32 or char.ord == 127)
-      str << char
-    end
-    str
-  end
+def strip_control_characters_and_excesses(string)
+  string.split("\033[2;0f").last.gsub(/(\e\[\d+\w)|(\e\[\w)/,"")
 end
 
 def assert_includes_in_order input, *items
-  input = strip_control_characters(input)
-  regexp_string = items.join(".*")
-  regexp = /#{regexp_string}/
-  assert_match regexp, input
+  input = strip_control_characters_and_excesses(input)
+  regexp_string = items.join(".*").gsub("?","\\?")
+  assert_match /#{regexp_string}/, input.delete("\n"), "Expected /#{regexp_string}/ to match:\n" + input
 end
 
 module DatabaseCleaner

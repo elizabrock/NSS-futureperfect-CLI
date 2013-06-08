@@ -1,6 +1,7 @@
 module Formatter
   @@out = Kernel
   @@output = []
+  @@longest_output = 0
   @@first_draw = true
 
   def self.output_to out
@@ -26,50 +27,60 @@ module Formatter
     out.puts BELL
   end
 
-  def redraw is_final_drawing = false
-    # move our command prompt to the top of the terminal window, by printing
-    # enough newlines to move it up there.
-    if @@first_draw
-      @@first_draw = false
-      out.print "\n" * (terminal_height - 2)
-    end
-    # move our cursor to the top of the terminal window
-    (terminal_height - 1).times { out.print "\e[1A" }
-
-    # \e[K clears the line before we print our new contents on top of it.
-    # This prevents the 'ghosting' effect, where some of the old content is
-    # still visible.
-    out.print "\n\e[K" + @@output.join("\n\e[K")
-
-    if is_final_drawing
-      out.print "\n" # So the prompt ends up on a fresh new line
-    else
-      fill_lines = (terminal_height - @@output.size - 2)
-      out.print "\n\e[K" * fill_lines
-    end
-  end
-
-  def add_line text
-    @@output << text
-    redraw
-  end
-
-  def replace_line replacement_text
-    @@output[@@output.length - 1] = replacement_text
-    redraw
-  end
-
-  def backtrack_line
-    out.print "\e[1A"
-  end
-
+  # "\033[<L>;<C>f" position the cursor a Line and Column
+  # "\e[1A"  go up a line
   # "\e[1G"  go to beginning of line
   # "\e[K" erase_to_line_end
   # "\e[1D" moves cursor left
   # "\e[1C" moves cursor right
+  def redraw
+    # move our command prompt to the top of the terminal window, by printing
+    # enough newlines to move it up there.
+    if @@first_draw
+      @@first_draw = false
+      out.print "\n" * screen_height
+    end
 
-  def terminal_height
-    `tput lines`.to_i
+    # move to top of screen
+    out.print "\033[2;0f"
+
+    # print each line of the output buffer by clearing the line, printing the
+    # line, then moving to the next line
+    @@output.each{ |line| out.print "\e[K" + line + "\n" }
+
+    # make sure that any typed input (which goes on the line after what we've
+    # previously printed) is wiped out
+    out.print "\e[K"
+  end
+
+  def reset_with_message message, skip_pause = false
+    # Added for clarity in test output
+    add_line "-resetting output-" if test_env?
+    replace_line message
+    unless test_env?
+      sleep 1 unless skip_pause
+      @@output = []
+    end
+  end
+
+  def add_line text
+    prepend = test_env? ? " +" : ""
+    @@output << "#{prepend}#{text}"
+    redraw
+  end
+
+  def replace_line replacement_text
+    if test_env?
+      # This makes easier to read test output
+      @@output << "^= #{replacement_text}"
+    else
+      @@output[@@output.length - 1] = replacement_text
+    end
+    redraw
+  end
+
+  def screen_height
+    @screen_height ||= (`tput lines`.to_i - 2)
   end
 
   private

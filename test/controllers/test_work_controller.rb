@@ -21,7 +21,7 @@ describe "WorkController" do
         Project.create(name: 'bar', last_worked_at: 1.days.ago)
         Project.create(name: 'grille', last_worked_at: Time.now)
         @next_project = Project.create(name: 'never', last_worked_at: nil, minutes_to_work: 0)
-        controller.start
+        controller.start false
       end
       it "starts the least recently worked project" do
         stdout.rewind

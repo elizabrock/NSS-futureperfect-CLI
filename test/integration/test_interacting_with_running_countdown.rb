@@ -47,4 +47,20 @@ class TestWorkingOnProject < MiniTest::Unit::TestCase
     assert_equal april_1.to_time, bar.last_worked_at.to_time
     assert_in_delta bar.skip_until.to_time, (Date.today + 1).to_time, 5
   end
+
+  def test_end_of_countdown_prompts_for_c_or_q
+    foo = Project.create!(name: "Foo", minutes_to_work: 0)
+    bar = Project.create!(name: "Bar", minutes_to_work: 0)
+    shell_output = ""
+    IO.popen('./futureperfect start', 'r+') do |pipe|
+      # starts on Foo, finishes Foo and prompts for c/q
+      pipe.puts("c")
+      # should continue to bar, finish bar, and prompt for c/q again
+      pipe.puts("q")
+      pipe.close_write
+      shell_output = pipe.read
+    end
+
+    assert_includes_in_order shell_output, "Foo", "Do you wish to continue? Press any key to continue or 'q' to quit", "Bar", "Do you wish to continue? Press any key to continue or 'q' to quit", "Done!"
+  end
 end

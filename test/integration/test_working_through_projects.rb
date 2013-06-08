@@ -24,7 +24,6 @@ describe "working through a project list" do
       project = Project.create!(name: "Foo", minutes_to_work: 0)
       shell_output = ""
       IO.popen('./futureperfect start', 'r+') do |pipe|
-        pipe.puts("n")
         pipe.puts("q")
         pipe.close_write
         shell_output = pipe.read
