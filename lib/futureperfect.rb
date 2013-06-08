@@ -17,7 +17,7 @@ class FuturePerfect
     routes = { "add" => { controller: :projects, action: :create },
               "list" => { controller: :projects, action: :index },
               "remove" => { controller: :projects, action: :destroy },
-              "start" => { controller: :work, action: :work_repl },
+              "start" => { controller: :work, action: :start },
               "help" => { controller: :help, action: :help }
              }
     fallback = { controller: :help, action: :unknown_command }

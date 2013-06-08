@@ -1,5 +1,4 @@
 require_relative 'formatter'
-require 'continuation'
 
 class Countdown
   include Formatter
@@ -11,17 +10,12 @@ class Countdown
     @end_time =  Time.now + total_time_in_seconds
   end
 
-  def time_remaining
-    @end_time - Time.now
-  end
-
   def countdown_with &continuation_block
     if @paused
-      replace_line "Paused.. Press 'q' to quit, or 'p' to resume"
       loop{ yield continuation_block }
     end
 
-    until time_remaining <= 0
+    until done?
       tick
       yield continuation_block
     end
@@ -37,6 +31,14 @@ class Countdown
     add_line colorize("Done!", BLUE)
     redraw :final
     ding!
+  end
+
+  def time_remaining
+    @end_time - Time.now
+  end
+
+  def done?
+    time_remaining <= 0
   end
 
   def stop!

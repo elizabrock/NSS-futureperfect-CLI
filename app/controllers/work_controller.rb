@@ -1,3 +1,5 @@
+require 'continuation'
+
 class WorkController
   include Formatter
 
@@ -7,59 +9,67 @@ class WorkController
     Formatter.output_to stdout
   end
 
-  def work_repl
+  def start
     if Project.count < 1
       @out.puts "You must enter a project before you can start working"
       return
     end
 
-    next_project_cc = nil
-    last_project = nil
-
-    message, verbiage = callcc { |continuation| next_project_cc = continuation }
-
-    if last_project and message
-      add_line verbiage + " " + last_project.name
-      last_project.send(message)
+    quit_cc = nil
+    quit = !callcc { |continuation| quit_cc = continuation }
+    if quit
+      @out.puts("Done!")
+      return
     end
-    last_project = next_project
-    work_project! last_project, next_project_cc
+
+    work_repl quit_cc
   end
 
-  def work_project! project, next_project_cc
-    countdown = Countdown.new(project.minutes_to_work)
+  private
 
+  def work_repl quit_cc
+    next_project_cc = nil
+    callcc { |continuation| next_project_cc = continuation }
+    work_project! next_project, next_project_cc, quit_cc
+  end
+
+  def work_project! project, next_project_cc, quit_cc
     add_line colorize(project.name, GREEN)
-    add_line "Starting" #This line will be overwritten
+    add_line "" #This line will be overwritten
 
     input_continuation = nil
     input = callcc { |continuation| input_continuation = continuation }
-    process_input_for input, countdown, next_project_cc
+    process_input_for input, project, next_project_cc, quit_cc
 
-    countdown.countdown_with do
+    project.countdown.countdown_with do
       FuturePerfect.check_for_input input_continuation
     end
-    project.process_worked!
+    project.stop_working!
   end
 
-  def process_input_for input, countdown, next_project_cc
+  def process_input_for input, project, next_project_cc, quit_cc
     return unless input.is_a? String
     if input.include? 'q'
-      countdown.stop!
+      add_line "Quitting #{project.name}"
+      project.stop_working! skipped: true
+      quit_cc.call
     elsif input.include? 's'
-      next_project_cc.call :process_skipped!, "Skipping"
+      add_line "Skipping #{project.name}"
+      project.stop_working! skipped: true
+      next_project_cc.call
     elsif input.include? 'n'
-      next_project_cc.call :process_nexted!, "Done with"
+      add_line "Done with #{project.name} early"
+      project.stop_working! skipped: false
+      next_project_cc.call
     elsif input.include? 'p'
-      countdown.toggle_pause!
+      replace_line "Paused.. Press 'q' to quit, or 'p' to resume"
+      project.countdown.toggle_pause!
     else
       # some other command that isn't implemented, ignore it.
       add_line "Command '#{input.strip}' is not supported"
       add_line "Cont..."
     end
   end
-
-  private
 
   def next_project
     if params[:project]
