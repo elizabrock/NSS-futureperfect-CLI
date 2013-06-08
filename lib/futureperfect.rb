@@ -17,31 +17,20 @@ class FuturePerfect
     routes = { "add" => { controller: :projects, action: :create },
               "list" => { controller: :projects, action: :index },
               "remove" => { controller: :projects, action: :destroy },
-              "start" => { controller: :work, action: :work_repl } }
+              "start" => { controller: :work, action: :work_repl },
+              "help" => { controller: :help, action: :help }
+             }
+    fallback = { controller: :help, action: :unknown_command }
 
     params = { command: command }
     if project_name
       params[:project] = { name: project_name }
     end
 
-    if route = routes[command]
-      controller_name = "#{route[:controller]}_controller"
-      controller_class = constantize(classify(controller_name))
-      controller = controller_class.new(params)
-      controller.send route[:action]
-    else
-      unless command == "help"
-        puts "FuturePerfect does not support the '#{command}' command.\n\n"
-      end
-      puts <<EOS
-Currently supported commands are:
-* futureperfect list
-* futureperfect add <project_name>
-* futureperfect remove <project_name>
-* futureperfect start
-
-See the README for more details
-EOS
-    end
+    route = routes[command] || fallback
+    controller_name = "#{route[:controller]}_controller"
+    controller_class = constantize(classify(controller_name))
+    controller = controller_class.new(params)
+    controller.send route[:action]
   end
 end
