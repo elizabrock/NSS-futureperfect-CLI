@@ -4,7 +4,7 @@ class TestWorkingOnProject < MiniTest::Unit::TestCase
   include DatabaseCleaner
 
   def test_q_causes_program_to_exit
-    Project.create!(name: "Foo")
+    project = Project.create!(name: "Foo")
     shell_output = ""
     IO.popen('./futureperfect start', 'r+') do |pipe|
       pipe.puts("q")
@@ -12,6 +12,8 @@ class TestWorkingOnProject < MiniTest::Unit::TestCase
       shell_output = pipe.read
     end
     assert_includes shell_output, "Done!"
+    project.reload
+    assert_nil project.skip_until
   end
 
   def test_n_causes_skip_to_next_project

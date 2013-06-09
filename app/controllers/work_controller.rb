@@ -63,7 +63,7 @@ class WorkController
     return unless input.is_a? String
     if input.include? 'q'
       reset_with_message "Quitting #{project.name}", :no_pause
-      project.stop_working! skipped: true
+      project.stop_working! skipped: false
       quit_cc.call
     elsif input.include? 's'
       reset_with_message "Skipping #{project.name}"
