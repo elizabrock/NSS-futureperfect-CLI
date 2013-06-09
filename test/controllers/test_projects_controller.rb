@@ -5,14 +5,18 @@ describe "ProjectsController" do
 
   let(:stdout){ StringIO.new }
   
+  before do
+    Formatter.output_to stdout
+    Formatter.reset!
+  end
+
   describe "#index" do
-    let(:controller){ ProjectsController.new( {}, stdout ) }
+    let(:controller){ ProjectsController.new( {} ) }
     describe "when there are no projects" do
       it "outputs an empty string" do
         assert Project.all.empty?
         controller.index
-        stdout.rewind
-        assert_equal "", stdout.read
+        assert_equal "", clean_output_from(stdout)
       end
     end
     describe "when there are multiple projects" do
@@ -28,8 +32,7 @@ describe "ProjectsController" do
  1.  foo                 30   
  2.  bar                 30   
 EOS
-        stdout.rewind
-        assert_equal expected, stdout.read
+        assert_equal expected, clean_output_from(stdout)
       end
     end
     describe "when some of the projects have been worked on" do
@@ -49,8 +52,7 @@ EOS
  4.  grille              30   05/03 00:00
 EOS
         controller.index
-        stdout.rewind
-        assert_equal expected, stdout.read
+        assert_equal expected, clean_output_from(stdout)
       end
     end
     describe "when some of the projects have been skipped" do
@@ -77,8 +79,7 @@ EOS
  7.  grille              30   #{today}
 EOS
         controller.index
-        stdout.rewind
-        assert_equal expected, stdout.read
+        assert_equal expected, clean_output_from(stdout)
       end
     end
     describe "when some of the projects have been completed" do
@@ -111,15 +112,14 @@ EOS
  2.  grille              #{today}
 EOS
         controller.index
-        stdout.rewind
-        assert_equal expected, stdout.read
+        assert_equal expected, clean_output_from(stdout)
       end
     end
   end
 
   describe "#create" do
     describe "success" do
-      let(:controller){ ProjectsController.new( { project: { name: 'foo' } }, stdout ) }
+      let(:controller){ ProjectsController.new( { project: { name: 'foo' } } ) }
 
       it "creates a new project" do
         expected_count = Project.count + 1
@@ -135,7 +135,7 @@ EOS
     end
 
     describe "duplicate" do
-      let(:controller){ ProjectsController.new( { project: { name: 'foo' } }, stdout ) }
+      let(:controller){ ProjectsController.new( { project: { name: 'foo' } } ) }
 
       before do
         Project.create( name: 'foo' )
@@ -148,25 +148,23 @@ EOS
       end
       it "returns an error for duplicate names" do
         controller.create
-        stdout.rewind
-        assert_includes stdout.read, 'Name must be unique'
+        assert_includes clean_output_from(stdout), 'Name must be unique'
       end
     end
 
     describe "blank name" do
-      let(:controller){ ProjectsController.new( { project: { name: nil } }, stdout ) }
+      let(:controller){ ProjectsController.new( { project: { name: nil } } ) }
 
       it "returns an error message" do
         controller.create
-        stdout.rewind
-        assert_includes stdout.read, "Name can't be blank"
+        assert_includes clean_output_from(stdout), "Name can't be blank"
       end
     end
   end
 
   describe "#destroy" do
     describe "removing the only project" do
-      let(:controller){ ProjectsController.new( { project: { name: 'only child' } }, stdout ) }
+      let(:controller){ ProjectsController.new( { project: { name: 'only child' } } ) }
       before do
         Project.create( name: 'only child')
         controller.destroy
@@ -176,18 +174,17 @@ EOS
       end
     end
     describe "attempting to remove a project that does not exist" do
-      let(:controller){ ProjectsController.new( { project: { name: "doesn't exist" } }, stdout ) }
+      let(:controller){ ProjectsController.new( { project: { name: "doesn't exist" } } ) }
       before do
         Project.create( name: 'exists')
         controller.destroy
       end
       it "should return an error" do
-        stdout.rewind
-        assert_includes stdout.read, "Project could not be found"
+        assert_includes clean_output_from(stdout), "Project could not be found"
       end
     end
     describe "removing a particular project amongst many" do
-      let(:controller){ ProjectsController.new( { project: { name: 'b' } }, stdout ) }
+      let(:controller){ ProjectsController.new( { project: { name: 'b' } } ) }
       before do
         Project.create( name: 'a')
         Project.create( name: 'b')

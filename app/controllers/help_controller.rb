@@ -1,29 +1,16 @@
-class HelpController
-  def initialize params, stdout = Kernel
-    @params = params
-    @out = stdout
-  end
-
+class HelpController < ApplicationController
   def help
-    @out.puts <<EOS
-Currently supported commands are:
-* futureperfect list
-* futureperfect add <project_name>
-* futureperfect remove <project_name>
-* futureperfect start
-
-See the README for more details
-EOS
+    add_line "Currently supported commands are:"
+    add_line "* futureperfect list"
+    add_line "* futureperfect add <project_name>"
+    add_line "* futureperfect remove <project_name>"
+    add_line "* futureperfect start"
+    add_line ""
+    add_line "See the README for more details"
   end
 
   def unknown_command
-    @out.puts "FuturePerfect does not support the '#{params[:command]}' command.\n\n"
+    add_line "FuturePerfect does not support the '#{params[:command]}' command.\n\n"
     self.help
-  end
-
-  private
-
-  def params
-    @params
   end
 end

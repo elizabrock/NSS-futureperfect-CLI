@@ -5,14 +5,18 @@ describe "WorkController" do
 
   let(:stdout){ StringIO.new }
   
+  before do
+    Formatter.output_to stdout
+    Formatter.reset!
+  end
+
   describe "#start" do
-    let(:controller){ WorkController.new( {}, stdout ) }
+    let(:controller){ WorkController.new( {} ) }
     describe "when there are no projects" do
       it "gives an error message" do
         assert Project.all.empty?
         controller.start
-        stdout.rewind
-        assert_includes stdout.read, "You must enter a project before you can start working"
+        assert_includes clean_output_from(stdout), "You must enter a project before you can start working"
       end
     end
     describe "when there are projects" do
@@ -24,8 +28,7 @@ describe "WorkController" do
         controller.start false
       end
       it "starts the least recently worked project" do
-        stdout.rewind
-        assert_includes stdout.read, "never"
+        assert_includes clean_output_from(stdout), "never"
       end
       it "sets the project to the correct updated last_worked_at" do
         @next_project.reload # reloads the project from the database

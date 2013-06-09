@@ -54,11 +54,19 @@ module Formatter
       out.print "#{preamble}\e[K" + line
     end
     # print a blank line and then the instructions
-    out.print "\n\e[K\n\e[K" + @@instructions
+    unless @@instructions.blank?
+      out.print "\n\e[K\n\e[K" + @@instructions
+    end
 
     # make sure that any typed input (which goes on the line after what we've
     # previously printed) is wiped out
     out.print "\n\e[K"
+  end
+
+  def self.reset!
+    @@output = []
+    @@first_draw = true
+    @@instructions = ""
   end
 
   def reset_with_message message, opts = {skip_pause: false}

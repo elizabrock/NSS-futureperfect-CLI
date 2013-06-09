@@ -13,7 +13,6 @@ class FuturePerfect
   end
 
   def self.route( command, project_name)
-    # This is a router:
     routes = { "add" => { controller: :projects, action: :create },
               "list" => { controller: :projects, action: :index },
               "remove" => { controller: :projects, action: :destroy },

@@ -1,14 +1,6 @@
 require 'continuation'
 
-class WorkController
-  include Formatter
-
-  def initialize params, stdout = Kernel
-    @params = params
-    @out = stdout
-    Formatter.output_to stdout
-  end
-
+class WorkController < ApplicationController
   def start continue_indefinitely = true
     if Project.workable.empty?
       add_line "You must enter a project before you can start working", BLUE
@@ -63,8 +55,7 @@ class WorkController
   def process_input_for input, project, next_project_cc, quit_cc
     return unless input.is_a? String
     if input.start_with? 'q'
-      reset_with_message "Quitting #{project.name}", skipe_pause: true
-      project.stop_working! skipped: false
+      reset_with_message "Quitting #{project.name}", skip_pause: false
       quit_cc.call
     elsif input.start_with? 's'
       reset_with_message "Skipping #{project.name}"
@@ -93,9 +84,5 @@ class WorkController
       params.delete(:project)
     end
     next_project || Project.workable.first
-  end
-
-  def params
-    @params
   end
 end
