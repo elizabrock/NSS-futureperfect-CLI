@@ -65,16 +65,16 @@ module Formatter
     opts[:color] ||= MAGENTA
     # Added for clarity in test output
     add_line "-resetting output-" if test_env?
-    replace_line message, opts[:color]
     unless test_env?
-      sleep 1 unless opts[:skip_pause]
       @@instructions = ""
       # blank the screen
       @@output = @@output.map{|line| ""}
       redraw
       # clear buffer
-      @@output = []
+      @@output = [""]
     end
+    replace_line message, opts[:color]
+    sleep 1 unless opts[:skip_pause] or test_env?
   end
 
   def add_line text, color = nil
