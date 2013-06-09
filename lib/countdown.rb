@@ -23,8 +23,7 @@ class Countdown
   end
 
   def tick
-    current_status = colorize( format_time(time_remaining), choose_color(time_remaining))
-    replace_line current_status
+    replace_line format_time(time_remaining), choose_color(time_remaining)
   end
 
   def time_remaining

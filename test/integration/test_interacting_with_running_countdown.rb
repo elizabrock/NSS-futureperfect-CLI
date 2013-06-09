@@ -3,7 +3,7 @@ require_relative '../test_helper'
 class TestWorkingOnProject < MiniTest::Unit::TestCase
   include DatabaseCleaner
 
-  def test_q_causes_program_to_exit
+  def test_q_causes_program_to_exit_without_changing_work_status
     project = Project.create!(name: "Foo")
     shell_output = ""
     IO.popen('./futureperfect start', 'r+') do |pipe|
@@ -28,6 +28,22 @@ class TestWorkingOnProject < MiniTest::Unit::TestCase
     end
 
     assert_includes_in_order shell_output, "Foo", "Bar", "Done!"
+  end
+
+  def test_done_causes_skip_to_next_project
+    project = Project.create!(name: "Foo")
+    Project.create!(name: "Bar")
+    shell_output = ""
+    IO.popen('./futureperfect start', 'r+') do |pipe|
+      pipe.puts("done")
+      pipe.puts("q")
+      pipe.close_write
+      shell_output = pipe.read
+    end
+
+    assert_includes_in_order shell_output, "Done with Foo forever!", "Bar", "Done!"
+    project.reload
+    assert project.complete?
   end
 
   def test_s_skips_project_and_marks_it_as_unstarted

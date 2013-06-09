@@ -23,10 +23,10 @@ describe "ProjectsController" do
       it "outputs the full list" do
         controller.index
         expected = <<EOS
- #   project    time  last worked
----  ---------  ----  -----------
- 1.  foo         30   
- 2.  bar         30   
+ #   project            time  last worked
+---  -----------------  ----  -----------
+ 1.  foo                 30   
+ 2.  bar                 30   
 EOS
         stdout.rewind
         assert_equal expected, stdout.read
@@ -41,12 +41,12 @@ EOS
       end
       it "lists them in order of least recently worked" do
         expected = <<EOS
- #   project     time  last worked
----  ----------  ----  -----------
- 1.  never        30   
- 2.  foo          30   05/01 00:00
- 3.  bar          30   05/02 00:00
- 4.  grille       30   05/03 00:00
+ #   project            time  last worked
+---  -----------------  ----  -----------
+ 1.  never               30   
+ 2.  foo                 30   05/01 00:00
+ 3.  bar                 30   05/02 00:00
+ 4.  grille              30   05/03 00:00
 EOS
         controller.index
         stdout.rewind
@@ -66,15 +66,49 @@ EOS
       it "should place those items last unless they are ready to be worked" do
         today = Date.today.beginning_of_day.try(:strftime, "%m/%d %H:%M")
         expected = <<EOS
- #   project           time  last worked
----  ----------------  ----  -----------
- 1.  never              30   
- 2.  foo is ready       30   04/29 00:00
- 3.  foo                30   05/01 00:00
- 4.  bar                30   05/02 00:00
- 5.  never ever         30   (skipped)
- 6.  foo skip           30   (skipped)
- 7.  grille             30   #{today}
+ #   project            time  last worked
+---  -----------------  ----  -----------
+ 1.  never               30   
+ 2.  foo is ready        30   04/29 00:00
+ 3.  foo                 30   05/01 00:00
+ 4.  bar                 30   05/02 00:00
+ 5.  never ever          30   (skipped)
+ 6.  foo skip            30   (skipped)
+ 7.  grille              30   #{today}
+EOS
+        controller.index
+        stdout.rewind
+        assert_equal expected, stdout.read
+      end
+    end
+    describe "when some of the projects have been completed" do
+      before do
+        Project.create(name: 'foo skip', last_worked_at: Date.parse("2013/05/01 00:00:00"), skip_until: (Date.today + 3))
+        Project.create(name: 'foo is ready', last_worked_at: Date.parse("2013/04/29 00:00:00"), skip_until: (Date.today - 1))
+        Project.create(name: 'foo', last_worked_at: Date.parse("2013/05/01 00:00:00"))
+        Project.create(name: 'bar', last_worked_at: Date.parse("2013/05/02 00:00:00"))
+        Project.create(name: 'grille', last_worked_at: Date.today.beginning_of_day, completed_at: Time.now)
+        Project.create(name: 'never', last_worked_at: nil)
+        Project.create(name: 'done never', last_worked_at: nil, completed_at: Date.today - 3)
+        Project.create(name: 'never ever', last_worked_at: nil, skip_until: (Time.now + (60*60)))
+      end
+      it "should place those items last unless they are ready to be worked" do
+        today = Date.today.beginning_of_day.try(:strftime, "%m/%d")
+        before = (Date.today - 3).beginning_of_day.try(:strftime, "%m/%d")
+        expected = <<EOS
+ #   project            time  last worked
+---  -----------------  ----  -----------
+ 1.  never               30   
+ 2.  foo is ready        30   04/29 00:00
+ 3.  foo                 30   05/01 00:00
+ 4.  bar                 30   05/02 00:00
+ 5.  never ever          30   (skipped)
+ 6.  foo skip            30   (skipped)
+
+ #   completed project  finished on
+---  -----------------  -----------
+ 1.  done never          #{before}
+ 2.  grille              #{today}
 EOS
         controller.index
         stdout.rewind

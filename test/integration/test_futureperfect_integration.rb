@@ -15,17 +15,11 @@ class TestFuturePerfectIntegration < MiniTest::Unit::TestCase
     # Adding the coveralls output to my test so I can check something out.
     expected = <<EOS
 [Coveralls] Using SimpleCov's default settings.
- #   project    time  last worked
----  ---------  ----  -----------
- 1.  foo         30   
- 2.  bar         30   
+ #   project            time  last worked
+---  -----------------  ----  -----------
+ 1.  foo                 30   
+ 2.  bar                 30   
 EOS
-    # expected = <<EOS
- # #   project    time  last worked
-# ---  ---------  ----  -----------
- # 1.  foo         30   
- # 2.  bar         30   
-# EOS
     assert_equal expected, actual
   end
 
