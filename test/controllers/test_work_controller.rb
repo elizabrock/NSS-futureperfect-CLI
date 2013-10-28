@@ -4,10 +4,9 @@ describe "WorkController" do
   include DatabaseCleaner
 
   let(:stdout){ StringIO.new }
-  
+
   before do
     Formatter.output_to stdout
-    Formatter.reset!
   end
 
   describe "#start" do

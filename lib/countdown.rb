@@ -23,7 +23,7 @@ class Countdown
   end
 
   def tick
-    replace_line format_time(time_remaining), choose_color(time_remaining)
+    set_time_remaining format_time(time_remaining), choose_color(time_remaining)
   end
 
   def time_remaining

@@ -4,10 +4,9 @@ describe "ProjectsController" do
   include DatabaseCleaner
 
   let(:stdout){ StringIO.new }
-  
+
   before do
     Formatter.output_to stdout
-    Formatter.reset!
   end
 
   describe "#index" do
@@ -29,8 +28,8 @@ describe "ProjectsController" do
         expected = <<EOS
  #   project            time  last worked
 ---  -----------------  ----  -----------
- 1.  foo                 30   
- 2.  bar                 30   
+ 1.  foo                 30
+ 2.  bar                 30
 
  #   [recently worked]  time  last worked
 ---  -----------------  ----  -----------
@@ -49,7 +48,7 @@ EOS
         expected = <<EOS
  #   project            time  last worked
 ---  -----------------  ----  -----------
- 1.  never               30   
+ 1.  never               30
  2.  foo                 30   05/01 00:00
  3.  bar                 30   05/02 00:00
  4.  grille              30   05/03 00:00
@@ -76,7 +75,7 @@ EOS
         expected = <<EOS
  #   project            time  last worked
 ---  -----------------  ----  -----------
- 1.  never               30   
+ 1.  never               30
  2.  foo is ready        30   04/29 00:00
  3.  foo                 30   05/01 00:00
  4.  bar                 30   05/02 00:00
@@ -108,7 +107,7 @@ EOS
         expected = <<EOS
  #   project            time  last worked
 ---  -----------------  ----  -----------
- 1.  never               30   
+ 1.  never               30
  2.  foo is ready        30   04/29 00:00
  3.  foo                 30   05/01 00:00
  4.  bar                 30   05/02 00:00

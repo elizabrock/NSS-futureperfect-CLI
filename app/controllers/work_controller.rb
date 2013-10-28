@@ -2,16 +2,15 @@ require 'continuation'
 
 class WorkController < ApplicationController
   def start continue_indefinitely = true
-    if Project.workable.empty?
-      add_line "You must enter a project before you can start working", BLUE
-      return
-    end
-
     quit_cc = nil
     quit = !callcc { |continuation| quit_cc = continuation }
     if quit
-      add_line "Done!", BLUE
+      out.puts colorize("Done!", BLUE)
       return
+    end
+
+    if Project.workable.empty?
+      exit_with "You must enter a project before you can start working", quit_cc
     end
 
     loop {
@@ -19,8 +18,7 @@ class WorkController < ApplicationController
       quit_cc.call unless continue_indefinitely
 
       if Project.workable.empty?
-        reset_with_message "All your work is done.  Goodbye!", color: BLUE, skip_pause: true
-        quit_cc.call
+        exit_with "All your work is done.  Goodbye!", quit_cc
       else
         set_instructions "Do you wish to continue? Press any key to continue or 'q' to quit"
         input = STDIN.gets
@@ -31,6 +29,10 @@ class WorkController < ApplicationController
 
   private
 
+  def default_instructions
+    "(q)uit, (s)kip, (n)ext, (d)one, (p)ause"
+  end
+
   def work_repl quit_cc
     next_project_cc = nil
     callcc { |continuation| next_project_cc = continuation }
@@ -38,14 +40,13 @@ class WorkController < ApplicationController
   end
 
   def work_project! project, next_project_cc, quit_cc
-    reset_with_message project.name, color: GREEN, skip_pause: true
-    add_line "This line will be overwritten with the countdown"
+    switch_to_project project.name
+    set_instructions(default_instructions)
 
     input_continuation = nil
     input = callcc { |continuation| input_continuation = continuation }
     process_input_for input, project, next_project_cc, quit_cc
 
-    set_instructions("(q)uit, (s)kip, (n)ext, (d)one, (p)ause")
     project.countdown.countdown_with do
       FuturePerfect.check_for_input input_continuation
     end
@@ -54,27 +55,34 @@ class WorkController < ApplicationController
 
   def process_input_for input, project, next_project_cc, quit_cc
     return unless input.is_a? String
+    erase_input
     if input.start_with? 'q'
-      reset_with_message "Quitting #{project.name}", skip_pause: false
-      quit_cc.call
+      exit_with "Quitting #{project.name}", quit_cc
     elsif input.start_with? 's'
-      reset_with_message "Skipping #{project.name}"
+      set_status "Skipping #{project.name}"
       project.stop_working! skipped: true
       next_project_cc.call
     elsif input.start_with? 'n'
-      reset_with_message "Done with #{project.name} early"
+      set_status "Done with #{project.name} early"
       project.stop_working! skipped: false
       next_project_cc.call
     elsif input.start_with? 'd'
-      reset_with_message "Done with #{project.name} forever!"
+      set_status "Done with #{project.name} forever!"
       project.stop_working! forever: true
       next_project_cc.call
     elsif input.start_with? 'p'
-      set_instructions "Paused.. Press 'q' to quit, or 'p' to resume"
+      if project.countdown.paused?
+        set_status "Resuming.."
+        set_instructions default_instructions
+        set_status ""
+      else
+        set_status "Paused.."
+        set_instructions "Press 'q' to quit, or 'p' to resume"
+      end
       project.countdown.toggle_pause!
     else
-      replace_line "Command '#{input.strip}' is not supported", MAGENTA
-      sleep 1
+      set_status "Command '#{input.strip}' is not supported", MAGENTA
+      set_status ""
     end
   end
 

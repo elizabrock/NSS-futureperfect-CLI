@@ -1,9 +1,10 @@
 module Formatter
   @@out = Kernel
-  @@output = []
-  @@longest_output = 0
-  @@first_draw = true
+  @@project_name = ""
+  @@time_remaining = ""
+  @@status = ""
   @@instructions = ""
+  @@first_project = true
 
   def self.output_to out
     @@out = out
@@ -19,104 +20,83 @@ module Formatter
   WHITE   = 37
 
   BELL = "\a"
-
-  def colorize text, color
-    return text unless color
-    # Set color, add text, unset color
-    "\e[#{color}m#{text}\e[0m"
-  end
-
-  def ding!
-    out.puts BELL
-  end
-
   # "\033[<L>;<C>f" position the cursor a Line and Column
   # "\e[1A"  go up a line
   # "\e[1G"  go to beginning of line
   # "\e[K" erase_to_line_end
   # "\e[1D" moves cursor left
   # "\e[1C" moves cursor right
-  def redraw
-    # move our command prompt to the top of the terminal window, by printing
-    # enough newlines to move it up there.
-    if @@first_draw
-      @@first_draw = false
-      out.print "\n" * screen_height
+
+  def switch_to_project(name)
+    unless @@project_name.blank?
+      out.print "-----\n"
     end
-
-    # move to top of screen
-    out.print "\033[2;0f"
-
-    # print each line of the output buffer by clearing the line, printing the
-    # line, then moving to the next line.
-    @@output.each_with_index do |line, i|
-      preamble = (i == 0 ) ? "" : "\n"
-      out.print "#{preamble}\e[K" + line
-    end
-    # print a blank line and then the instructions
-    unless @@instructions.blank?
-      out.print "\n\e[K\n\e[K" + @@instructions
-    end
-
-    # make sure that any typed input (which goes on the line after what we've
-    # previously printed) is wiped out
-    out.print "\n\e[K"
-  end
-
-  def self.reset!
-    @@output = []
-    @@first_draw = true
-    @@instructions = ""
-  end
-
-  def reset_with_message message, opts = {skip_pause: false}
-    opts[:color] ||= MAGENTA
-    # Added for clarity in test output
-    add_line "-resetting output-" if test_env?
-    unless test_env?
-      @@instructions = ""
-      # blank the screen
-      @@output = @@output.map{|line| ""}
-      redraw
-      # clear buffer
-      @@output = [""]
-    end
-    replace_line message, opts[:color]
-    sleep 1 unless opts[:skip_pause] or test_env?
-  end
-
-  def add_line text, color = nil
-    prepend = test_env? ? " +" : ""
-    @@output << colorize("#{prepend}#{text}", color)
-    redraw
-  end
-
-  def replace_line replacement_text, color = nil
-    if @@output.empty?
-      add_line replacement_text, color
-      return
-    end
-    if test_env?
-      # This makes easier to read test output
-      @@output << "^= #{replacement_text}"
-    else
-      @@output[@@output.length - 1] = colorize(replacement_text, color)
-    end
-    redraw
+    out.print "\n" * 4
+    @@project_name = colorize(name, GREEN)
+    @@time_remaining = "-"
+    @@status = "-"
+    @@instructions = "-"
+    draw
   end
 
   def set_instructions instructions, color = BLUE
-    # Makes it easier for the tests to see the instructions
-    add_line instructions if test_env?
+    # # Makes it easier for the tests to see the instructions
     @@instructions = colorize(instructions, color)
-    redraw
+    draw
   end
 
-  def screen_height
-    @screen_height ||= (`tput lines`.to_i - 2)
+  def set_status status, color = BLACK
+    @@status = colorize(status, color)
+    draw
+    sleep 1 unless test_env?
+  end
+
+  def set_time_remaining time_remaining, color
+    @@time_remaining = colorize(time_remaining, color)
+    draw
+  end
+
+  def exit_with message, quit_cc
+    set_instructions ""
+    out.puts message
+    quit_cc.call
+  end
+
+  def erase_input
+    out.print "\e[1G" # Go to beginning of line
+    out.print "\e[K"  # Erase current line
+    out.print "\e[1A" # Go up 1 lines
+  end
+
+  def draw
+    unless test_env?
+      out.print "\e[1A" * 4 # Go up 5 lines, which is 4 lines of text plus one of input (the last newline)
+    end
+    [@@project_name, @@time_remaining, @@status, @@instructions].each do |replacement_text|
+      out.print "\e[1G"     # Go to beginning of line
+      out.print "\e[K"      # Erase current line
+      out.print replacement_text + "\n"
+    end
+  end
+
+  # Used a.la carte, outside of project printing
+  def add_line text, color = nil
+    # prepend = test_env? ? " +" : ""
+    prepend = ""
+    out.print colorize("#{prepend}#{text.rstrip}\n", color)
+  end
+
+  def ding!
+    out.puts BELL
   end
 
   private
+
+  def colorize text, color
+    return text unless color
+    # Set color, add text, unset color
+    "\e[#{color}m#{text}\e[0m"
+  end
 
   def out
     @@out
