@@ -1,6 +1,8 @@
 NSS-futureperfect-CLI
 =====================
 
+TODO: Titlebar should include current project/status
+
 Purpose
 -------
 

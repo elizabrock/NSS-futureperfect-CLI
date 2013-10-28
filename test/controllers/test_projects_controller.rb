@@ -31,6 +31,9 @@ describe "ProjectsController" do
 ---  -----------------  ----  -----------
  1.  foo                 30   
  2.  bar                 30   
+
+ #   [recently worked]  time  last worked
+---  -----------------  ----  -----------
 EOS
         assert_equal expected, clean_output_from(stdout)
       end
@@ -50,6 +53,9 @@ EOS
  2.  foo                 30   05/01 00:00
  3.  bar                 30   05/02 00:00
  4.  grille              30   05/03 00:00
+
+ #   [recently worked]  time  last worked
+---  -----------------  ----  -----------
 EOS
         controller.index
         assert_equal expected, clean_output_from(stdout)
@@ -74,9 +80,12 @@ EOS
  2.  foo is ready        30   04/29 00:00
  3.  foo                 30   05/01 00:00
  4.  bar                 30   05/02 00:00
- 5.  never ever          30   (skipped)
- 6.  foo skip            30   (skipped)
- 7.  grille              30   #{today}
+
+ #   [recently worked]  time  last worked
+---  -----------------  ----  -----------
+ 1.  never ever          30   (skipped)
+ 2.  foo skip            30   (skipped)
+ 3.  grille              30   #{today}
 EOS
         controller.index
         assert_equal expected, clean_output_from(stdout)
@@ -103,10 +112,13 @@ EOS
  2.  foo is ready        30   04/29 00:00
  3.  foo                 30   05/01 00:00
  4.  bar                 30   05/02 00:00
- 5.  never ever          30   (skipped)
- 6.  foo skip            30   (skipped)
 
- #   completed project  finished on
+ #   [recently worked]  time  last worked
+---  -----------------  ----  -----------
+ 1.  never ever          30   (skipped)
+ 2.  foo skip            30   (skipped)
+
+ #   [completed projects]  finished on
 ---  -----------------  -----------
  1.  done never          #{before}
  2.  grille              #{today}

@@ -18,6 +18,9 @@ class TestFuturePerfectIntegration < MiniTest::Unit::TestCase
 ---  -----------------  ----  -----------
  1.  foo                 30   
  2.  bar                 30   
+
+ #   [recently worked]  time  last worked
+---  -----------------  ----  -----------
 EOS
     assert_equal expected, strip_control_characters_and_excesses(actual)
   end
