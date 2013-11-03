@@ -11,7 +11,15 @@ require_relative 'bootstrap_ar'
 database = ENV['FP_ENV'] || 'development'
 connect_to database
 
-command = ARGV[0]
-project_name = ARGV[1] # can be nil
+command = ARGV.shift # ARGV[0]
+flags = {}
+project_name = nil
+ARGV.each do |argument|
+  if argument.start_with? "--"
+    flags[ argument.gsub("--","").to_sym ] = true
+  else
+    project_name = argument
+  end
+end
 
-FuturePerfect.route(command, project_name)
+FuturePerfect.route(command, project_name, flags)

@@ -12,7 +12,7 @@ class FuturePerfect
     continuation.call input
   end
 
-  def self.route( command, project_name)
+  def self.route( command, project_name, params)
     routes = { "add" => { controller: :projects, action: :create },
               "list" => { controller: :projects, action: :index },
               "remove" => { controller: :projects, action: :destroy },
@@ -21,7 +21,7 @@ class FuturePerfect
              }
     fallback = { controller: :help, action: :unknown_command }
 
-    params = { command: command }
+    params[:command] = command
     if project_name
       params[:project] = { name: project_name }
     end

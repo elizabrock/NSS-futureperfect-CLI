@@ -17,8 +17,9 @@ class Project < ActiveRecord::Base
     !!completed_at
   end
 
-  def countdown
-    @countdown ||= Countdown.new(minutes_to_work)
+  def countdown( countfast = false)
+    minutes = countfast ? 1 : minutes_to_work
+    @countdown ||= Countdown.new(minutes)
   end
 
   def stop_working! opts = {}

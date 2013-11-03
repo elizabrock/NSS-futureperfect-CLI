@@ -47,7 +47,7 @@ class WorkController < ApplicationController
     input = callcc { |continuation| input_continuation = continuation }
     process_input_for input, project, next_project_cc, quit_cc
 
-    project.countdown.countdown_with do
+    project.countdown(params[:fast]).countdown_with do
       FuturePerfect.check_for_input input_continuation
     end
     project.stop_working!
