@@ -16,6 +16,37 @@ class TestWorkingOnProject < MiniTest::Unit::TestCase
     assert_nil project.skip_until
   end
 
+  def test_a_adds_a_project
+    project = Project.create!(name: "Foo")
+    shell_output = ""
+    original_project_count = Project.count
+    IO.popen('./futureperfect start', 'r+') do |pipe|
+      pipe.puts("add New Project")
+      pipe.puts("q")
+      pipe.close_write
+      shell_output = pipe.read
+    end
+    assert_includes shell_output, "New Project has been added!"
+    assert_equal Project.count, original_project_count + 1
+    assert_equal Project.last.name, "New Project"
+  end
+
+  def test_a_doesnt_fail_on_duplicates
+    project = Project.create!(name: "Foo")
+    project = Project.create!(name: "Bar")
+    shell_output = ""
+    original_project_count = Project.count
+    IO.popen('./futureperfect start', 'r+') do |pipe|
+      pipe.puts("add Foo")
+      pipe.puts("n")
+      pipe.puts("q")
+      pipe.close_write
+      shell_output = pipe.read
+    end
+    assert_equal Project.count, original_project_count
+    assert_includes_in_order shell_output, "Foo", "must be unique", "Bar", "Done!"
+  end
+
   def test_n_causes_skip_to_next_project
     Project.create!(name: "Foo")
     Project.create!(name: "Bar")
