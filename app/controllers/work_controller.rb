@@ -70,6 +70,16 @@ class WorkController < ApplicationController
       set_status "Done with #{project.name} forever!"
       project.stop_working! forever: true
       next_project_cc.call
+    elsif input.start_with? 'a'
+      project_name = input.strip.gsub(/^add /, '')
+      project = Project.new(name: project_name)
+      if project.save
+        set_status("#{project.name} has been added!")
+        set_status("")
+      else
+        set_status("#{project.errors.full_messages.join(", ")}")
+        set_status("")
+      end
     elsif input.start_with? 'p'
       if project.countdown.paused?
         set_status "Resuming.."
